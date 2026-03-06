@@ -23,14 +23,34 @@ namespace Exchange.Infrastructure.Services.Bacen
             var response = await _httpClient.GetFromJsonAsync<CurrencyBacenResponse>(url);
 
             CurrencyItemBacen item = response?.Value?.FirstOrDefault()
-                       ?? throw new InvalidOperationException("No exchange rate found.");
-            
+                ?? throw new InvalidOperationException("No exchange rate found.");
+
             return new ExchangeRate(
                 currency,
                 item.CotacaoCompra,
                 item.CotacaoVenda,
                 item.DataHoraCotacao
             );
+        }
+
+        public async Task<IReadOnlyCollection<string>> GetSupportedCurrenciesAsync()
+        {
+            const string url = "https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/Moedas?$top=100&$format=json";
+
+            var response = await _httpClient.GetFromJsonAsync<CurrencyBacenResponse>(url);
+            var symbols = response?.Value?
+                .Where(x => !string.IsNullOrWhiteSpace(x.Simbolo))
+                .Select(x => x.Simbolo.Trim().ToUpper())
+                .Distinct()
+                .OrderBy(x => x)
+                .ToList();
+
+            if (symbols is null || symbols.Count == 0)
+            {
+                throw new InvalidOperationException("No supported currencies found.");
+            }
+
+            return symbols;
         }
     }
 }

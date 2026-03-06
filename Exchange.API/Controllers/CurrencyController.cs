@@ -68,9 +68,9 @@ namespace Exchange.API.Controllers
         }
 
         [HttpGet("supported")]
-        public IActionResult GetSupportedCurrencies()
+        public async Task<IActionResult> GetSupportedCurrencies()
         {
-            var currencies = _getSupportedCurrenciesUseCase.Execute();
+            var currencies = await _getSupportedCurrenciesUseCase.ExecuteAsync();
             return Ok(new { currencies });
         }
     }
