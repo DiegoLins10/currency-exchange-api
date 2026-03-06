@@ -2,7 +2,7 @@
 {
     public class AuthResponse
     {
-        public string AccessToken { get; set; }
-        public DateTime ExpiresIn { get; set; }
+        public string AccessToken { get; set; } = string.Empty;
+        public DateTime ExpiresAt { get; set; }
     }
 }

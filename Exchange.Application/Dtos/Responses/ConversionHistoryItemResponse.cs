@@ -2,13 +2,15 @@
 
 namespace Exchange.Application.Dtos.Responses
 {
-    public record ConvertCurrencyResponse(
-        decimal OriginalAmount,
+    public record ConversionHistoryItemResponse(
+        Guid Id,
         string FromCurrency,
-        decimal ConvertedAmount,
         string ToCurrency,
+        decimal OriginalAmount,
+        decimal ConvertedAmount,
         decimal ExchangeRate,
         ExchangeQuotationEnum ExchangeType,
         DateOnly DateQuotation,
-        string Provider);
+        string Provider,
+        DateTime ConversionDate);
 }

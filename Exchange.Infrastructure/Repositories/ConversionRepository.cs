@@ -20,11 +20,50 @@ namespace Exchange.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<ConversionRecord>> GetHistoryAsync()
+        public async Task<(IEnumerable<ConversionRecord> Items, int TotalCount)> GetHistoryAsync(
+            string? fromCurrency,
+            string? toCurrency,
+            DateOnly? startDate,
+            DateOnly? endDate,
+            int page,
+            int pageSize)
         {
-            return await _context.ConversionRecords
-                                 .OrderByDescending(c => c.ConversionDate) // exemplo de ordenação
-                                 .ToListAsync();
+            var query = _context.ConversionRecords.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(fromCurrency))
+            {
+                query = query.Where(c => c.FromCurrency == fromCurrency.ToUpper());
+            }
+
+            if (!string.IsNullOrWhiteSpace(toCurrency))
+            {
+                query = query.Where(c => c.ToCurrency == toCurrency.ToUpper());
+            }
+
+            if (startDate.HasValue)
+            {
+                query = query.Where(c => c.QuotationDate >= startDate.Value);
+            }
+
+            if (endDate.HasValue)
+            {
+                query = query.Where(c => c.QuotationDate <= endDate.Value);
+            }
+
+            var totalCount = await query.CountAsync();
+
+            var items = await query
+                .OrderByDescending(c => c.ConversionDate)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (items, totalCount);
+        }
+
+        public async Task<ConversionRecord?> GetByIdAsync(Guid id)
+        {
+            return await _context.ConversionRecords.FirstOrDefaultAsync(c => c.Id == id);
         }
     }
 }
