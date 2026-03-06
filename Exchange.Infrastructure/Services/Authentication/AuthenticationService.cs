@@ -27,19 +27,17 @@ namespace Exchange.Infrastructure.Services.Authentication
 
             if (client == null)
             {
-                throw new UnauthorizedAccessException("Invalid credentials");
+                throw new UnauthorizedAccessException("Credenciais inválidas.");
             }
 
             var claims = new[]
             {
-            new Claim(JwtRegisteredClaimNames.Sub, request.ClientId),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
+                new Claim(JwtRegisteredClaimNames.Sub, request.ClientId),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
 
-            var key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
             var expiration = DateTime.UtcNow.AddHours(1);
 
             var token = new JwtSecurityToken(
@@ -53,7 +51,7 @@ namespace Exchange.Infrastructure.Services.Authentication
             return new AuthResponse
             {
                 AccessToken = new JwtSecurityTokenHandler().WriteToken(token),
-                ExpiresIn = expiration
+                ExpiresAt = expiration
             };
         }
     }

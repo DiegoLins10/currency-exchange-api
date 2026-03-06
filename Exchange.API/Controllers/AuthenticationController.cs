@@ -1,6 +1,5 @@
 ﻿using Exchange.Application.Dtos.Requests;
 using Exchange.Application.Interfaces;
-using Exchange.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Exchange.API.Controllers

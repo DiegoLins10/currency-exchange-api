@@ -22,34 +22,32 @@ namespace Exchange.API.Middleware
             catch (ArgumentException ex)
             {
                 _logger.LogWarning(ex, "ArgumentException capturada");
-
-                httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
-                httpContext.Response.ContentType = "application/json";
-
-                var result = JsonSerializer.Serialize(new { error = ex.Message });
-                await httpContext.Response.WriteAsync(result);
+                await WriteErrorAsync(httpContext, StatusCodes.Status400BadRequest, ex.Message);
             }
             catch (InvalidOperationException ex)
             {
                 _logger.LogWarning(ex, "InvalidOperationException capturada");
-
-                httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
-                httpContext.Response.ContentType = "application/json";
-
-                var result = JsonSerializer.Serialize(new { error = ex.Message });
-                await httpContext.Response.WriteAsync(result);
+                await WriteErrorAsync(httpContext, StatusCodes.Status400BadRequest, ex.Message);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogWarning(ex, "UnauthorizedAccessException capturada");
+                await WriteErrorAsync(httpContext, StatusCodes.Status401Unauthorized, ex.Message);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Erro não tratado");
-
-                httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                httpContext.Response.ContentType = "application/json";
-
-                var result = JsonSerializer.Serialize(new { error = $"Ocorreu um erro inesperado. {ex.Message}" });
-                await httpContext.Response.WriteAsync(result);
+                await WriteErrorAsync(httpContext, StatusCodes.Status500InternalServerError, "Ocorreu um erro inesperado.");
             }
         }
-    }
 
+        private static async Task WriteErrorAsync(HttpContext context, int statusCode, string message)
+        {
+            context.Response.StatusCode = statusCode;
+            context.Response.ContentType = "application/json";
+
+            var result = JsonSerializer.Serialize(new { error = message });
+            await context.Response.WriteAsync(result);
+        }
+    }
 }
