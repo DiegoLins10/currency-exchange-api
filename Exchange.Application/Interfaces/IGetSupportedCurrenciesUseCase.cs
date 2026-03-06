@@ -2,6 +2,6 @@
 {
     public interface IGetSupportedCurrenciesUseCase
     {
-        IReadOnlyCollection<string> Execute();
+        Task<IReadOnlyCollection<string>> ExecuteAsync();
     }
 }

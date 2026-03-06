@@ -1,4 +1,7 @@
-﻿using Exchange.Application.UseCases.GetSupportedCurrencies;
+﻿using Exchange.Application.Interfaces;
+using Exchange.Application.UseCases.GetSupportedCurrencies;
+using Exchange.Domain.Interfaces;
+using Moq;
 using Xunit;
 
 namespace Exchange.Unit.Tests.Application.UseCases
@@ -6,16 +9,22 @@ namespace Exchange.Unit.Tests.Application.UseCases
     public class GetSupportedCurrenciesUseCaseTests
     {
         [Fact]
-        public void Execute_ShouldReturnSupportedCurrencies()
+        public async Task ExecuteAsync_ShouldReturnSupportedCurrenciesFromProvider()
         {
-            var useCase = new GetSupportedCurrenciesUseCase();
+            var providerMock = new Mock<IExchangeRateProvider>();
+            var expected = new List<string> { "AUD", "EUR", "USD" };
 
-            var result = useCase.Execute();
+            providerMock
+                .Setup(p => p.GetSupportedCurrenciesAsync())
+                .ReturnsAsync(expected);
 
-            Assert.NotNull(result);
+            IGetSupportedCurrenciesUseCase useCase = new GetSupportedCurrenciesUseCase(providerMock.Object);
+
+            var result = await useCase.ExecuteAsync();
+
+            Assert.Equal(3, result.Count);
             Assert.Contains("USD", result);
-            Assert.Contains("EUR", result);
-            Assert.Equal(8, result.Count);
+            providerMock.Verify(p => p.GetSupportedCurrenciesAsync(), Times.Once);
         }
     }
 }
