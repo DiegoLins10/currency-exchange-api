@@ -180,6 +180,7 @@ Exemplo: [Bacen - Exemplo de busca](https://olinda.bcb.gov.br/olinda/servico/PTA
 * [x] ✅ **Evoluir rotas de câmbio** com `rate`, `supported` e `history/{id}` (DONE).
 * [x] ✅ **Adicionar filtros e paginação no histórico** de conversões (DONE).
 * [x] ✅ **Ampliar cobertura de testes unitários** com relatório de cobertura (DONE).
+* [x] ✅ **buscar moedas suportadas dinamicamente no Bacen (DONE).
 * [ ] 🧩 **Adicionar result pattern ao projeto**
 * [x] ☁️🚀 **Implantar na AWS**
 * [ ] ⏰ **Adicionar agendamento de conversões** com notificação quando taxa atingir determinado valor.
