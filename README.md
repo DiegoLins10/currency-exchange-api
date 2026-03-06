@@ -62,11 +62,14 @@ Exchange.sln
 
 ## 🔍 Endpoints Principais
 
-| Método | Endpoint                | Descrição                                     |
-| ------ | ----------------------- | --------------------------------------------- |
-| POST   | `/api/currency/convert` | Converte um valor de uma moeda para outra.    |
-| GET    | `/api/currency/history` | Retorna o histórico de conversões realizadas. |
-| POST    | `/api/authentication/token` | Gera um token JWT para autenticação do cliente usando `client_id` e `secret`. Esse token deve ser usado para acessar endpoints protegidos da API. |
+| Método | Endpoint | Descrição |
+| ------ | -------- | --------- |
+| POST | `/api/currency/convert` | Converte um valor de BRL para outra moeda. |
+| GET | `/api/currency/history` | Retorna o histórico de conversões com filtros e paginação. |
+| GET | `/api/currency/history/{id}` | Retorna os detalhes de uma conversão específica. |
+| GET | `/api/currency/rate` | Consulta cotação de compra/venda por moeda e data. |
+| GET | `/api/currency/supported` | Lista as moedas suportadas pela API. |
+| POST | `/api/authentication/token` | Gera um token JWT para autenticação usando `client_id` e `secret` (via header). |
 
 ---
 
