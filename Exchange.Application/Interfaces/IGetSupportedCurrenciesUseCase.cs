@@ -1,7 +1,9 @@
-﻿namespace Exchange.Application.Interfaces
+﻿using Exchange.Application.Dtos.Responses;
+
+namespace Exchange.Application.Interfaces
 {
     public interface IGetSupportedCurrenciesUseCase
     {
-        Task<IReadOnlyCollection<string>> ExecuteAsync();
+        Task<IReadOnlyCollection<SupportedCurrencyResponse>> ExecuteAsync();
     }
 }

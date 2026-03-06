@@ -1,4 +1,5 @@
-﻿using Exchange.Application.Interfaces;
+﻿using Exchange.Application.Dtos.Responses;
+using Exchange.Application.Interfaces;
 using Exchange.Domain.Interfaces;
 
 namespace Exchange.Application.UseCases.GetSupportedCurrencies
@@ -12,9 +13,13 @@ namespace Exchange.Application.UseCases.GetSupportedCurrencies
             _exchangeRateProvider = exchangeRateProvider;
         }
 
-        public Task<IReadOnlyCollection<string>> ExecuteAsync()
+        public async Task<IReadOnlyCollection<SupportedCurrencyResponse>> ExecuteAsync()
         {
-            return _exchangeRateProvider.GetSupportedCurrenciesAsync();
+            var currencies = await _exchangeRateProvider.GetSupportedCurrenciesAsync();
+
+            return currencies
+                .Select(c => new SupportedCurrencyResponse(c.Symbol, c.Name))
+                .ToList();
         }
     }
 }

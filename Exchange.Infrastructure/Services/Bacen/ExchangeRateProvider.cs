@@ -33,24 +33,42 @@ namespace Exchange.Infrastructure.Services.Bacen
             );
         }
 
-        public async Task<IReadOnlyCollection<string>> GetSupportedCurrenciesAsync()
+        public async Task<IReadOnlyCollection<SupportedCurrency>> GetSupportedCurrenciesAsync()
         {
             const string url = "https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/Moedas?$top=100&$format=json";
 
             var response = await _httpClient.GetFromJsonAsync<CurrencyBacenResponse>(url);
-            var symbols = response?.Value?
+            var currencies = response?.Value?
                 .Where(x => !string.IsNullOrWhiteSpace(x.Simbolo))
-                .Select(x => x.Simbolo.Trim().ToUpper())
-                .Distinct()
-                .OrderBy(x => x)
+                .Select(x => new SupportedCurrency(
+                    x.Simbolo.Trim().ToUpper(),
+                    ResolveCurrencyName(x)))
+                .GroupBy(x => x.Symbol)
+                .Select(g => g.First())
+                .OrderBy(x => x.Symbol)
                 .ToList();
 
-            if (symbols is null || symbols.Count == 0)
+            if (currencies is null || currencies.Count == 0)
             {
                 throw new InvalidOperationException("No supported currencies found.");
             }
 
-            return symbols;
+            return currencies;
+        }
+
+        private static string ResolveCurrencyName(CurrencyItemBacen item)
+        {
+            if (!string.IsNullOrWhiteSpace(item.NomeFormatado))
+            {
+                return item.NomeFormatado.Trim();
+            }
+
+            if (!string.IsNullOrWhiteSpace(item.NomeMoeda))
+            {
+                return item.NomeMoeda.Trim();
+            }
+
+            return item.Simbolo.Trim().ToUpper();
         }
     }
 }
