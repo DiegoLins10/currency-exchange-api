@@ -12,11 +12,19 @@ namespace Exchange.API.Controllers
     {
         private readonly IConvertCurrencyUseCase _convertCurrencyUseCase;
         private readonly IGetConversionHistoryUseCase _getConversionHistoryUseCase;
+        private readonly IGetExchangeRateUseCase _getExchangeRateUseCase;
+        private readonly IGetSupportedCurrenciesUseCase _getSupportedCurrenciesUseCase;
 
-        public CurrencyController(IConvertCurrencyUseCase convertCurrencyUseCase, IGetConversionHistoryUseCase getConversionHistoryUseCase)
+        public CurrencyController(
+            IConvertCurrencyUseCase convertCurrencyUseCase,
+            IGetConversionHistoryUseCase getConversionHistoryUseCase,
+            IGetExchangeRateUseCase getExchangeRateUseCase,
+            IGetSupportedCurrenciesUseCase getSupportedCurrenciesUseCase)
         {
             _convertCurrencyUseCase = convertCurrencyUseCase;
             _getConversionHistoryUseCase = getConversionHistoryUseCase;
+            _getExchangeRateUseCase = getExchangeRateUseCase;
+            _getSupportedCurrenciesUseCase = getSupportedCurrenciesUseCase;
         }
 
         [HttpPost("convert")]
@@ -27,10 +35,43 @@ namespace Exchange.API.Controllers
         }
 
         [HttpGet("history")]
-        public async Task<IActionResult> GetHistory()
+        public async Task<IActionResult> GetHistory(
+            [FromQuery] string? fromCurrency,
+            [FromQuery] string? toCurrency,
+            [FromQuery] DateOnly? startDate,
+            [FromQuery] DateOnly? endDate,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 20)
         {
-            var history = await _getConversionHistoryUseCase.ExecuteAsync();
+            var request = new GetConversionHistoryRequest(fromCurrency, toCurrency, startDate, endDate, page, pageSize);
+            var history = await _getConversionHistoryUseCase.ExecuteAsync(request);
             return Ok(history);
+        }
+
+        [HttpGet("history/{id:guid}")]
+        public async Task<IActionResult> GetHistoryById(Guid id)
+        {
+            var item = await _getConversionHistoryUseCase.GetByIdAsync(id);
+            if (item is null)
+            {
+                return NotFound(new { error = "Conversão não encontrada." });
+            }
+
+            return Ok(item);
+        }
+
+        [HttpGet("rate")]
+        public async Task<IActionResult> GetRate([FromQuery] string currency, [FromQuery] DateOnly dateQuotation)
+        {
+            var result = await _getExchangeRateUseCase.ExecuteAsync(currency, dateQuotation);
+            return Ok(result);
+        }
+
+        [HttpGet("supported")]
+        public IActionResult GetSupportedCurrencies()
+        {
+            var currencies = _getSupportedCurrenciesUseCase.Execute();
+            return Ok(new { currencies });
         }
     }
 }

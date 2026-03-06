@@ -1,16 +1,11 @@
-﻿using Exchange.Application.UseCases.ConvertCurrency;
-using Exchange.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Exchange.Application.Dtos.Requests;
+using Exchange.Application.Dtos.Responses;
 
 namespace Exchange.Application.Interfaces
 {
     public interface IGetConversionHistoryUseCase
     {
-        Task<IEnumerable<ConversionRecord>> ExecuteAsync();
-
+        Task<PaginatedConversionHistoryResponse> ExecuteAsync(GetConversionHistoryRequest request);
+        Task<ConversionHistoryItemResponse?> GetByIdAsync(Guid id);
     }
 }

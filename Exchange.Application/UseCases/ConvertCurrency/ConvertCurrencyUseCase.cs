@@ -12,6 +12,8 @@ namespace Exchange.Application.UseCases.ConvertCurrency
         private readonly IExchangeRateProvider _rateProvider;
         private readonly IConversionRepository _repository;
 
+        private const string ProviderName = "BACEN";
+
         public ConvertCurrencyUseCase(IExchangeRateProvider rateProvider, IConversionRepository repository)
         {
             _rateProvider = rateProvider;
@@ -29,12 +31,17 @@ namespace Exchange.Application.UseCases.ConvertCurrency
 
             decimal convertedAmount = request.AmountBRL / exchangeParity;
 
+            DateOnly quotationDate = TryResolveQuotationDate(exchangeRate.QuotationDate, request.DateQuotation);
+
             var record = new ConversionRecord(
                 "BRL",
                 request.ToCurrency,
                 request.AmountBRL,
                 convertedAmount,
-                exchangeParity
+                exchangeParity,
+                request.ExchangeType,
+                quotationDate,
+                ProviderName
             );
 
             await _repository.SaveAsync(record);
@@ -44,8 +51,21 @@ namespace Exchange.Application.UseCases.ConvertCurrency
                 "BRL",
                 Math.Round(convertedAmount, 2),
                 request.ToCurrency,
-                Math.Round(exchangeParity, 2)
+                Math.Round(exchangeParity, 2),
+                request.ExchangeType,
+                quotationDate,
+                ProviderName
             );
+        }
+
+        private static DateOnly TryResolveQuotationDate(string providerQuotationDate, DateOnly fallbackDate)
+        {
+            if (DateTime.TryParse(providerQuotationDate, out var parsed))
+            {
+                return DateOnly.FromDateTime(parsed);
+            }
+
+            return fallbackDate;
         }
     }
 }
