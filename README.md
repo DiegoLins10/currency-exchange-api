@@ -55,6 +55,10 @@ Exchange.sln
 2. 🛠️ Abra a solução `Exchange.sln` no Visual Studio ou VS Code
 3. 📦 Restaure as dependências e compile o projeto
 4. ▶️ Execute o projeto `Exchange.API`
+   No VS Code/terminal, você pode iniciar com:
+   ```bash
+   dotnet run --project Exchange.API\Exchange.API.csproj --launch-profile Exchange.API
+   ```
 5. 🌐 Acesse a documentação Swagger em `https://localhost:{porta}/swagger` (se configurado)
 6. 💸 Use o endpoint `POST /api/currency/convert` para realizar conversões
 
