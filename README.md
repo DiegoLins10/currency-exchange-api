@@ -183,7 +183,7 @@ Exemplo: [Bacen - Exemplo de busca](https://olinda.bcb.gov.br/olinda/servico/PTA
 * [ ] 🧩 **Adicionar result pattern ao projeto**
 * [x] ☁️🚀 **Implantar na AWS**
 * [ ] ⏰ **Adicionar agendamento de conversões** com notificação quando taxa atingir determinado valor.
-
+* [ ] 🧪 **Adicionar Testes de integração** 
 ### ***Indicadores de Conclusão***
  * [ ] = tarefa pendente.  
  * [x] = tarefa concluída
