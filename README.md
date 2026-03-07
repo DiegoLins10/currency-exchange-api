@@ -98,7 +98,6 @@ secret: f8d9a7b6-2c3e-4f7a-8b1d-3e2f4a5b6c7d
     "expiresAt": "2026-03-07T15:00:00Z"
   },
   "error": null,
-  "meta": null
 }
 ```
 
@@ -141,7 +140,6 @@ Content-Type: application/json
     "provider": "BACEN"
   },
   "error": null,
-  "meta": null
 }
 ```
 
@@ -154,7 +152,6 @@ Content-Type: application/json
     "message": "O valor deve ser maior que zero.",
     "details": null
   },
-  "meta": null
 }
 ```
 
@@ -227,7 +224,7 @@ Exemplo: [Bacen - Exemplo de busca](https://olinda.bcb.gov.br/olinda/servico/PTA
 * [x] ✅ **Ampliar cobertura de testes unitários** com relatório de cobertura (DONE).
 * [x] ✅ **buscar moedas suportadas dinamicamente no Bacen (DONE).
 * [x] ✅ **Adicionar result pattern ao projeto** (DONE)
-* [x] ✅ **Padronizar response envelope REST (`success/data/error/meta`)** (DONE)
+* [x] ✅ **Padronizar response envelope REST (`success/data/error`)** (DONE)
 * [x] ☁️🚀 **Implantar na AWS**
 * [ ] ⏰ **Adicionar agendamento de conversões** com notificação quando taxa atingir determinado valor.
 * [ ] 🧪 **Adicionar testes de integração** 
@@ -238,7 +235,3 @@ Exemplo: [Bacen - Exemplo de busca](https://olinda.bcb.gov.br/olinda/servico/PTA
 ---
 
 ### ✨ Made with ❤️ and ☕ by Diego Fernandes Lins ✨
-
-
-
-

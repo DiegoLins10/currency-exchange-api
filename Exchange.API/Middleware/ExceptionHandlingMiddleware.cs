@@ -51,8 +51,7 @@ namespace Exchange.API.Middleware
             {
                 Success = false,
                 Data = null,
-                Error = new ApiError(code, message),
-                Meta = null
+                Error = new ApiError(code, message)
             });
 
             await context.Response.WriteAsync(result);

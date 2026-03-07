@@ -7,6 +7,5 @@
         public required bool Success { get; init; }
         public T? Data { get; init; }
         public ApiError? Error { get; init; }
-        public object? Meta { get; init; }
     }
 }

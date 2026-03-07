@@ -6,7 +6,7 @@ namespace Exchange.API.Extensions
 {
     public static class ResultExtensions
     {
-        public static IActionResult ToActionResult<T>(this ControllerBase controller, Result<T> result, object? meta = null)
+        public static IActionResult ToActionResult<T>(this ControllerBase controller, Result<T> result)
         {
             if (result.IsSuccess)
             {
@@ -14,8 +14,7 @@ namespace Exchange.API.Extensions
                 {
                     Success = true,
                     Data = result.Value,
-                    Error = null,
-                    Meta = meta
+                    Error = null
                 });
             }
 
@@ -35,8 +34,7 @@ namespace Exchange.API.Extensions
                 Error = new ApiError(
                     result.Error?.Code ?? "BAD_REQUEST",
                     result.Error?.Message ?? "Não foi possível processar a requisição.",
-                    result.Error?.Details),
-                Meta = meta
+                    result.Error?.Details)
             });
         }
     }
