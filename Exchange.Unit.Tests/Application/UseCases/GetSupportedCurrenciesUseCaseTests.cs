@@ -28,8 +28,10 @@ namespace Exchange.Unit.Tests.Application.UseCases
 
             var result = await useCase.ExecuteAsync();
 
-            Assert.Equal(3, result.Count);
-            Assert.Contains(result, x => x.Symbol == "USD" && x.Name == "Dólar dos EUA");
+            Assert.True(result.IsSuccess);
+            Assert.NotNull(result.Value);
+            Assert.Equal(3, result.Value!.Count);
+            Assert.Contains(result.Value, x => x.Symbol == "USD" && x.Name == "Dólar dos EUA");
             providerMock.Verify(p => p.GetSupportedCurrenciesAsync(), Times.Once);
         }
     }

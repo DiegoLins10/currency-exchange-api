@@ -1,4 +1,5 @@
-﻿using Exchange.Application.Dtos.Requests;
+﻿using Exchange.Application.Common;
+using Exchange.Application.Dtos.Requests;
 using Exchange.Application.Dtos.Responses;
 using Exchange.Application.Interfaces;
 using Exchange.Domain.Interfaces;
@@ -17,16 +18,16 @@ namespace Exchange.Application.UseCases.GetConversionHistory
             _memoryCache = memoryCache;
         }
 
-        public async Task<PaginatedConversionHistoryResponse> ExecuteAsync(GetConversionHistoryRequest request)
+        public async Task<Result<PaginatedConversionHistoryResponse>> ExecuteAsync(GetConversionHistoryRequest request)
         {
             if (request.Page <= 0)
             {
-                throw new ArgumentException("Page deve ser maior que zero.");
+                return Result<PaginatedConversionHistoryResponse>.Failure(new ResultError("VALIDATION_ERROR", "Page deve ser maior que zero."));
             }
 
             if (request.PageSize <= 0 || request.PageSize > 100)
             {
-                throw new ArgumentException("PageSize deve estar entre 1 e 100.");
+                return Result<PaginatedConversionHistoryResponse>.Failure(new ResultError("VALIDATION_ERROR", "PageSize deve estar entre 1 e 100."));
             }
 
             var normalizedFrom = NormalizeCurrency(request.FromCurrency);
@@ -36,7 +37,7 @@ namespace Exchange.Application.UseCases.GetConversionHistory
 
             if (_memoryCache.TryGetValue(cacheKey, out PaginatedConversionHistoryResponse? cachedHistory) && cachedHistory is not null)
             {
-                return cachedHistory;
+                return Result<PaginatedConversionHistoryResponse>.Success(cachedHistory);
             }
 
             var (items, totalCount) = await _repository.GetHistoryAsync(
@@ -55,13 +56,18 @@ namespace Exchange.Application.UseCases.GetConversionHistory
 
             _memoryCache.Set(cacheKey, response, TimeSpan.FromSeconds(60));
 
-            return response;
+            return Result<PaginatedConversionHistoryResponse>.Success(response);
         }
 
-        public async Task<ConversionHistoryItemResponse?> GetByIdAsync(Guid id)
+        public async Task<Result<ConversionHistoryItemResponse>> GetByIdAsync(Guid id)
         {
             var item = await _repository.GetByIdAsync(id);
-            return item is null ? null : MapToResponse(item);
+            if (item is null)
+            {
+                return Result<ConversionHistoryItemResponse>.Failure(new ResultError("NOT_FOUND", "Conversão não encontrada."));
+            }
+
+            return Result<ConversionHistoryItemResponse>.Success(MapToResponse(item));
         }
 
         private static string NormalizeCurrency(string? currency)

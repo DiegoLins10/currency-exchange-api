@@ -1,4 +1,5 @@
-﻿using Exchange.Application.Dtos.Responses;
+﻿using Exchange.Application.Common;
+using Exchange.Application.Dtos.Responses;
 using Exchange.Application.Interfaces;
 using Exchange.Domain.Interfaces;
 
@@ -14,11 +15,11 @@ namespace Exchange.Application.UseCases.GetExchangeRate
             _exchangeRateProvider = exchangeRateProvider;
         }
 
-        public async Task<ExchangeRateResponse> ExecuteAsync(string currency, DateOnly dateQuotation)
+        public async Task<Result<ExchangeRateResponse>> ExecuteAsync(string currency, DateOnly dateQuotation)
         {
             if (string.IsNullOrWhiteSpace(currency))
             {
-                throw new ArgumentException("currency é obrigatório.");
+                return Result<ExchangeRateResponse>.Failure(new ResultError("VALIDATION_ERROR", "currency é obrigatório."));
             }
 
             var normalizedCurrency = currency.Trim().ToUpper();
@@ -27,7 +28,8 @@ namespace Exchange.Application.UseCases.GetExchangeRate
                 ? DateOnly.FromDateTime(parsed)
                 : dateQuotation;
 
-            return new ExchangeRateResponse(rate.Currency, rate.BuyRate, rate.SellRate, date, ProviderName);
+            var response = new ExchangeRateResponse(rate.Currency, rate.BuyRate, rate.SellRate, date, ProviderName);
+            return Result<ExchangeRateResponse>.Success(response);
         }
     }
 }

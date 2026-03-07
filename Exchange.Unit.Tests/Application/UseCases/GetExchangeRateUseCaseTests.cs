@@ -18,9 +18,11 @@ namespace Exchange.Unit.Tests.Application.UseCases
         }
 
         [Fact]
-        public async Task ExecuteAsync_ShouldThrowArgumentException_WhenCurrencyIsInvalid()
+        public async Task ExecuteAsync_ShouldReturnFailure_WhenCurrencyIsInvalid()
         {
-            await Assert.ThrowsAsync<ArgumentException>(() => _useCase.ExecuteAsync(" ", new DateOnly(2025, 8, 13)));
+            var result = await _useCase.ExecuteAsync(" ", new DateOnly(2025, 8, 13));
+            Assert.True(result.IsFailure);
+            Assert.Equal("VALIDATION_ERROR", result.Error?.Code);
         }
 
         [Fact]
@@ -35,11 +37,13 @@ namespace Exchange.Unit.Tests.Application.UseCases
 
             var result = await _useCase.ExecuteAsync(" eur ", dateQuotation);
 
-            Assert.Equal("EUR", result.Currency);
-            Assert.Equal(6.10m, result.BuyRate);
-            Assert.Equal(6.20m, result.SellRate);
-            Assert.Equal(new DateOnly(2025, 8, 13), result.DateQuotation);
-            Assert.Equal("BACEN", result.Provider);
+            Assert.True(result.IsSuccess);
+            Assert.NotNull(result.Value);
+            Assert.Equal("EUR", result.Value!.Currency);
+            Assert.Equal(6.10m, result.Value.BuyRate);
+            Assert.Equal(6.20m, result.Value.SellRate);
+            Assert.Equal(new DateOnly(2025, 8, 13), result.Value.DateQuotation);
+            Assert.Equal("BACEN", result.Value.Provider);
         }
 
         [Fact]
@@ -54,7 +58,8 @@ namespace Exchange.Unit.Tests.Application.UseCases
 
             var result = await _useCase.ExecuteAsync("USD", dateQuotation);
 
-            Assert.Equal(dateQuotation, result.DateQuotation);
+            Assert.True(result.IsSuccess);
+            Assert.Equal(dateQuotation, result.Value!.DateQuotation);
         }
     }
 }

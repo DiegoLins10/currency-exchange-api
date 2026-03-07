@@ -22,9 +22,26 @@ namespace Exchange.Unit.Tests.Application.UseCases
 
             var result = await useCase.ExecuteAsync(request);
 
-            Assert.Equal(expected.AccessToken, result.AccessToken);
-            Assert.Equal(expected.ExpiresAt, result.ExpiresAt);
+            Assert.True(result.IsSuccess);
+            Assert.Equal(expected.AccessToken, result.Value!.AccessToken);
+            Assert.Equal(expected.ExpiresAt, result.Value.ExpiresAt);
             serviceMock.Verify(s => s.Authenticate(request), Times.Once);
+        }
+
+        [Fact]
+        public async Task ExecuteAsync_ShouldReturnFailure_WhenCredentialsAreInvalid()
+        {
+            var serviceMock = new Mock<IAuthenticationService>();
+            var useCase = new AuthenticateClientUseCase(serviceMock.Object);
+            var request = new AuthRequest { ClientId = "client", ClientSecret = "secret" };
+
+            serviceMock.Setup(s => s.Authenticate(request))
+                .ThrowsAsync(new UnauthorizedAccessException("Credenciais inválidas."));
+
+            var result = await useCase.ExecuteAsync(request);
+
+            Assert.True(result.IsFailure);
+            Assert.Equal("UNAUTHORIZED", result.Error?.Code);
         }
     }
 }

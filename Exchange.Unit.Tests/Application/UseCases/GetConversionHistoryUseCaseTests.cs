@@ -30,9 +30,10 @@ namespace Exchange.Unit.Tests.Application.UseCases
 
             var result = await _useCase.ExecuteAsync(new GetConversionHistoryRequest(null, null, null, null));
 
-            Assert.NotNull(result);
-            Assert.Empty(result.Items);
-            Assert.Equal(0, result.TotalCount);
+            Assert.True(result.IsSuccess);
+            Assert.NotNull(result.Value);
+            Assert.Empty(result.Value!.Items);
+            Assert.Equal(0, result.Value.TotalCount);
         }
 
         [Fact]
@@ -49,25 +50,28 @@ namespace Exchange.Unit.Tests.Application.UseCases
 
             var result = await _useCase.ExecuteAsync(new GetConversionHistoryRequest(null, null, null, null));
 
-            Assert.NotNull(result);
-            Assert.Equal(2, result.Items.Count());
-            Assert.Equal(2, result.TotalCount);
-            Assert.Contains(result.Items, r => r.ToCurrency == "EUR" && r.OriginalAmount == 1000m);
-            Assert.Contains(result.Items, r => r.ToCurrency == "USD" && r.OriginalAmount == 500m);
+            Assert.True(result.IsSuccess);
+            Assert.NotNull(result.Value);
+            Assert.Equal(2, result.Value!.Items.Count());
+            Assert.Equal(2, result.Value.TotalCount);
+            Assert.Contains(result.Value.Items, r => r.ToCurrency == "EUR" && r.OriginalAmount == 1000m);
+            Assert.Contains(result.Value.Items, r => r.ToCurrency == "USD" && r.OriginalAmount == 500m);
         }
 
         [Fact]
-        public async Task ExecuteAsync_ShouldThrowArgumentException_WhenPageIsInvalid()
+        public async Task ExecuteAsync_ShouldReturnFailure_WhenPageIsInvalid()
         {
-            await Assert.ThrowsAsync<ArgumentException>(() =>
-                _useCase.ExecuteAsync(new GetConversionHistoryRequest(null, null, null, null, 0, 20)));
+            var result = await _useCase.ExecuteAsync(new GetConversionHistoryRequest(null, null, null, null, 0, 20));
+            Assert.True(result.IsFailure);
+            Assert.Equal("VALIDATION_ERROR", result.Error?.Code);
         }
 
         [Fact]
-        public async Task ExecuteAsync_ShouldThrowArgumentException_WhenPageSizeIsInvalid()
+        public async Task ExecuteAsync_ShouldReturnFailure_WhenPageSizeIsInvalid()
         {
-            await Assert.ThrowsAsync<ArgumentException>(() =>
-                _useCase.ExecuteAsync(new GetConversionHistoryRequest(null, null, null, null, 1, 101)));
+            var result = await _useCase.ExecuteAsync(new GetConversionHistoryRequest(null, null, null, null, 1, 101));
+            Assert.True(result.IsFailure);
+            Assert.Equal("VALIDATION_ERROR", result.Error?.Code);
         }
 
         [Fact]
@@ -86,20 +90,23 @@ namespace Exchange.Unit.Tests.Application.UseCases
             var first = await _useCase.ExecuteAsync(request);
             var second = await _useCase.ExecuteAsync(request);
 
-            Assert.Single(first.Items);
-            Assert.Single(second.Items);
+            Assert.True(first.IsSuccess);
+            Assert.True(second.IsSuccess);
+            Assert.Single(first.Value!.Items);
+            Assert.Single(second.Value!.Items);
             _repositoryMock.Verify(r => r.GetHistoryAsync("BRL", "EUR", null, null, 1, 20), Times.Once);
         }
 
         [Fact]
-        public async Task GetByIdAsync_ShouldReturnNull_WhenItemDoesNotExist()
+        public async Task GetByIdAsync_ShouldReturnFailure_WhenItemDoesNotExist()
         {
             _repositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((ConversionRecord?)null);
 
             var result = await _useCase.GetByIdAsync(Guid.NewGuid());
 
-            Assert.Null(result);
+            Assert.True(result.IsFailure);
+            Assert.Equal("NOT_FOUND", result.Error?.Code);
         }
 
         [Fact]
@@ -113,10 +120,11 @@ namespace Exchange.Unit.Tests.Application.UseCases
 
             var result = await _useCase.GetByIdAsync(id);
 
-            Assert.NotNull(result);
-            Assert.Equal("USD", result!.ToCurrency);
-            Assert.Equal(ExchangeQuotationEnum.Sell, result.ExchangeType);
-            Assert.Equal("BACEN", result.Provider);
+            Assert.True(result.IsSuccess);
+            Assert.NotNull(result.Value);
+            Assert.Equal("USD", result.Value!.ToCurrency);
+            Assert.Equal(ExchangeQuotationEnum.Sell, result.Value.ExchangeType);
+            Assert.Equal("BACEN", result.Value.Provider);
         }
     }
 }

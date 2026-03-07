@@ -22,7 +22,7 @@ namespace Exchange.Unit.Tests.Application.UseCases
         }
 
         [Fact]
-        public async Task ExecuteAsync_ShouldThrowArgumentException_WhenAmountBRLIsZero()
+        public async Task ExecuteAsync_ShouldReturnFailure_WhenAmountBRLIsZero()
         {
             var request = new ConvertCurrencyRequest(
                 ToCurrency: "EUR",
@@ -31,7 +31,10 @@ namespace Exchange.Unit.Tests.Application.UseCases
                 ExchangeType: ExchangeQuotationEnum.Buy
             );
 
-            await Assert.ThrowsAsync<ArgumentException>(() => _useCase.ExecuteAsync(request));
+            var result = await _useCase.ExecuteAsync(request);
+
+            Assert.True(result.IsFailure);
+            Assert.Equal("VALIDATION_ERROR", result.Error?.Code);
         }
 
         [Fact]
@@ -50,16 +53,18 @@ namespace Exchange.Unit.Tests.Application.UseCases
                 .Setup(x => x.GetExchangeRateAsync(request.ToCurrency, request.DateQuotation))
                 .ReturnsAsync(exchangeRate);
 
-            var response = await _useCase.ExecuteAsync(request);
+            var result = await _useCase.ExecuteAsync(request);
 
-            Assert.Equal(1000m, response.OriginalAmount);
-            Assert.Equal("BRL", response.FromCurrency);
-            Assert.Equal("EUR", response.ToCurrency);
-            Assert.Equal(Math.Round(1000m / exchangeRate.BuyRate, 2), response.ConvertedAmount);
-            Assert.Equal(Math.Round(exchangeRate.BuyRate, 2), response.ExchangeRate);
-            Assert.Equal(ExchangeQuotationEnum.Buy, response.ExchangeType);
-            Assert.Equal("BACEN", response.Provider);
-            Assert.Equal(new DateOnly(2025, 8, 13), response.DateQuotation);
+            Assert.True(result.IsSuccess);
+            Assert.NotNull(result.Value);
+            Assert.Equal(1000m, result.Value!.OriginalAmount);
+            Assert.Equal("BRL", result.Value.FromCurrency);
+            Assert.Equal("EUR", result.Value.ToCurrency);
+            Assert.Equal(Math.Round(1000m / exchangeRate.BuyRate, 2), result.Value.ConvertedAmount);
+            Assert.Equal(Math.Round(exchangeRate.BuyRate, 2), result.Value.ExchangeRate);
+            Assert.Equal(ExchangeQuotationEnum.Buy, result.Value.ExchangeType);
+            Assert.Equal("BACEN", result.Value.Provider);
+            Assert.Equal(new DateOnly(2025, 8, 13), result.Value.DateQuotation);
 
             _repositoryMock.Verify(r => r.SaveAsync(It.IsAny<ConversionRecord>()), Times.Once);
         }
@@ -80,11 +85,13 @@ namespace Exchange.Unit.Tests.Application.UseCases
                 .Setup(x => x.GetExchangeRateAsync(request.ToCurrency, request.DateQuotation))
                 .ReturnsAsync(exchangeRate);
 
-            var response = await _useCase.ExecuteAsync(request);
+            var result = await _useCase.ExecuteAsync(request);
 
-            Assert.Equal(Math.Round(1000m / exchangeRate.SellRate, 2), response.ConvertedAmount);
-            Assert.Equal(Math.Round(exchangeRate.SellRate, 2), response.ExchangeRate);
-            Assert.Equal(ExchangeQuotationEnum.Sell, response.ExchangeType);
+            Assert.True(result.IsSuccess);
+            Assert.NotNull(result.Value);
+            Assert.Equal(Math.Round(1000m / exchangeRate.SellRate, 2), result.Value!.ConvertedAmount);
+            Assert.Equal(Math.Round(exchangeRate.SellRate, 2), result.Value.ExchangeRate);
+            Assert.Equal(ExchangeQuotationEnum.Sell, result.Value.ExchangeType);
 
             _repositoryMock.Verify(r => r.SaveAsync(It.IsAny<ConversionRecord>()), Times.Once);
         }
@@ -100,9 +107,10 @@ namespace Exchange.Unit.Tests.Application.UseCases
                 .Setup(x => x.GetExchangeRateAsync(request.ToCurrency, request.DateQuotation))
                 .ReturnsAsync(exchangeRate);
 
-            var response = await _useCase.ExecuteAsync(request);
+            var result = await _useCase.ExecuteAsync(request);
 
-            Assert.Equal(requestDate, response.DateQuotation);
+            Assert.True(result.IsSuccess);
+            Assert.Equal(requestDate, result.Value!.DateQuotation);
         }
     }
 }

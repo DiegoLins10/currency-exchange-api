@@ -1,4 +1,5 @@
-﻿using Exchange.Application.Dtos.Requests;
+﻿using Exchange.Application.Common;
+using Exchange.Application.Dtos.Requests;
 using Exchange.Application.Dtos.Responses;
 using Exchange.Application.Interfaces;
 using Exchange.Domain.Entities;
@@ -20,10 +21,12 @@ namespace Exchange.Application.UseCases.ConvertCurrency
             _repository = repository;
         }
 
-        public async Task<ConvertCurrencyResponse> ExecuteAsync(ConvertCurrencyRequest request)
+        public async Task<Result<ConvertCurrencyResponse>> ExecuteAsync(ConvertCurrencyRequest request)
         {
             if (request.AmountBRL <= 0)
-                throw new ArgumentException("O valor deve ser maior que zero.");
+            {
+                return Result<ConvertCurrencyResponse>.Failure(new ResultError("VALIDATION_ERROR", "O valor deve ser maior que zero."));
+            }
 
             ExchangeRate exchangeRate = await _rateProvider.GetExchangeRateAsync(request.ToCurrency, request.DateQuotation);
 
@@ -46,7 +49,7 @@ namespace Exchange.Application.UseCases.ConvertCurrency
 
             await _repository.SaveAsync(record);
 
-            return new ConvertCurrencyResponse(
+            var response = new ConvertCurrencyResponse(
                 request.AmountBRL,
                 "BRL",
                 Math.Round(convertedAmount, 2),
@@ -56,6 +59,8 @@ namespace Exchange.Application.UseCases.ConvertCurrency
                 quotationDate,
                 ProviderName
             );
+
+            return Result<ConvertCurrencyResponse>.Success(response);
         }
 
         private static DateOnly TryResolveQuotationDate(string providerQuotationDate, DateOnly fallbackDate)
