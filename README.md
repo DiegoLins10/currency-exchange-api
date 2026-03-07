@@ -217,14 +217,14 @@ curl --location --request POST 'http://alb-exchange-1526545477.us-east-1.elb.ama
 Fonte:
 [Bacen - Taxas de Câmbio - Dados Abertos](https://dadosabertos.bcb.gov.br/dataset/taxas-de-cambio-todos-os-boletins-diarios/resource/61318ccb-db9d-4d6c-87f5-d8013af7a401?inner_span=True)  
 Exemplo: [Bacen - Exemplo de busca](https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/aplicacao#!/recursos/CotacaoMoedaDia#eyJmb3JtdWxhcmlvIjp7IiRmb3JtYXQiOiJqc29uIiwiJHRvcCI6MSwibW9lZGEiOiJFVVIiLCJkYXRhQ290YWNhbyI6IjA4LTE1LTIwMjUifSwicGVzcXVpc2FkbyI6dHJ1ZSwiYWN0aXZlVGFiIjoiZGFkb3MiLCJncmlkU3RhdGUiOnsDMAM6W3sDQgMiBDAEIiwDQQN9LHsDQgMiBDEEIiwDQQN9LHsDQgMiBDIEIiwDQQN9LHsDQgMiBDMEIiwDQQN9LHsDQgMiBDQEIiwDQQN9LHsDQgMiBDUEIiwDQQN9XSwDMQM6e30sAzIDOltdLAMzAzp7fSwDNAM6e30sAzUDOnt9fSwicGl2b3RPcHRpb25zIjp7A2EDOnt9LANiAzpbXSwDYwM6NTAwLANkAzpbXSwDZQM6W10sA2YDOltdLANnAzoia2V5X2FfdG9feiIsA2gDOiJrZXlfYV90b196IiwDaQM6e30sA2oDOnt9LANrAzo4NSwDbAM6ZmFsc2UsA20DOnt9LANuAzp7fSwDbwM6IkNvbnRhZ2VtIiwDcAM6IlRhYmxlIn19)
-* [x] ✅🔐 **Implementar autenticação e autorização** (DONE).
-* [x] ✅🧪 **Adicionar testes automatizados** (DONE).
-* [x] ✅ **Evoluir rotas de câmbio** com `rate`, `supported` e `history/{id}` (DONE).
-* [x] ✅ **Adicionar filtros e paginação no histórico** de conversões (DONE).
-* [x] ✅ **Ampliar cobertura de testes unitários** com relatório de cobertura (DONE).
-* [x] ✅ **buscar moedas suportadas dinamicamente no Bacen (DONE).
-* [x] ✅ **Adicionar result pattern ao projeto** (DONE)
-* [x] ✅ **Padronizar response envelope REST (`success/data/error`)** (DONE)
+* [x] 🔐✅ **Implementar autenticação e autorização** (DONE).
+* [x] 🧪✅ **Adicionar testes automatizados** (DONE).
+* [x] 💱✅ **Evoluir rotas de câmbio** com `rate`, `supported` e `history/{id}` (DONE).
+* [x] 📜✅ **Adicionar filtros e paginação no histórico** de conversões (DONE).
+* [x] 📊✅ **Ampliar cobertura de testes unitários** com relatório de cobertura (DONE).
+* [x] 🌐✅ **Buscar moedas suportadas dinamicamente no Bacen** (DONE).
+* [x] 🧩✅ **Adicionar Result Pattern ao projeto** (DONE).
+* [x] 📦✅ **Padronizar response envelope REST (`success/data/error`)** (DONE).
 * [x] ☁️🚀 **Implantar na AWS**
 * [ ] ⏰ **Adicionar agendamento de conversões** com notificação quando taxa atingir determinado valor.
 * [ ] 🧪 **Adicionar testes de integração** 
