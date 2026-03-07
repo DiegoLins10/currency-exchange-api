@@ -80,6 +80,30 @@ Exchange.sln
 
 ## 📄 Exemplo de Requisição
 
+**POST** `/api/authentication/token`  
+**Headers:**
+
+```
+client_id: 3f29b6e7-1c4b-4f9a-b8b4-2f5e2f4d5c6a
+secret: f8d9a7b6-2c3e-4f7a-8b1d-3e2f4a5b6c7d
+```
+
+**Resposta esperada (resumo):**
+
+```json
+{
+  "success": true,
+  "data": {
+    "accessToken": "jwt-token",
+    "expiresAt": "2026-03-07T15:00:00Z"
+  },
+  "error": null,
+  "meta": null
+}
+```
+
+---
+
 **POST** `/api/currency/convert`
 **Headers:**
 
@@ -105,11 +129,32 @@ Content-Type: application/json
 
 ```json
 {
+  "success": true,
+  "data": {
     "originalAmount": 1000,
     "fromCurrency": "BRL",
     "convertedAmount": 158.75,
     "toCurrency": "EUR",
-    "exchangeRate": 6.30
+    "exchangeRate": 6.30,
+    "exchangeType": 1,
+    "dateQuotation": "2025-08-13",
+    "provider": "BACEN"
+  },
+  "error": null,
+  "meta": null
+}
+```
+
+```json
+{
+  "success": false,
+  "data": null,
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "O valor deve ser maior que zero.",
+    "details": null
+  },
+  "meta": null
 }
 ```
 
@@ -181,10 +226,11 @@ Exemplo: [Bacen - Exemplo de busca](https://olinda.bcb.gov.br/olinda/servico/PTA
 * [x] ✅ **Adicionar filtros e paginação no histórico** de conversões (DONE).
 * [x] ✅ **Ampliar cobertura de testes unitários** com relatório de cobertura (DONE).
 * [x] ✅ **buscar moedas suportadas dinamicamente no Bacen (DONE).
-* [ ] 🧩 **Adicionar result pattern ao projeto**
+* [x] ✅ **Adicionar result pattern ao projeto** (DONE)
+* [x] ✅ **Padronizar response envelope REST (`success/data/error/meta`)** (DONE)
 * [x] ☁️🚀 **Implantar na AWS**
 * [ ] ⏰ **Adicionar agendamento de conversões** com notificação quando taxa atingir determinado valor.
-* [ ] 🧪 **Adicionar Testes de integração** 
+* [ ] 🧪 **Adicionar testes de integração** 
 ### ***Indicadores de Conclusão***
  * [ ] = tarefa pendente.  
  * [x] = tarefa concluída
