@@ -1,4 +1,5 @@
-﻿using Exchange.Application.Dtos.Requests;
+﻿using Exchange.API.Extensions;
+using Exchange.Application.Dtos.Requests;
 using Exchange.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +32,7 @@ namespace Exchange.API.Controllers
         public async Task<IActionResult> Convert([FromBody] ConvertCurrencyRequest request)
         {
             var result = await _convertCurrencyUseCase.ExecuteAsync(request);
-            return Ok(result);
+            return this.ToActionResult(result);
         }
 
         [HttpGet("history")]
@@ -45,33 +46,28 @@ namespace Exchange.API.Controllers
         {
             var request = new GetConversionHistoryRequest(fromCurrency, toCurrency, startDate, endDate, page, pageSize);
             var history = await _getConversionHistoryUseCase.ExecuteAsync(request);
-            return Ok(history);
+            return this.ToActionResult(history);
         }
 
         [HttpGet("history/{id:guid}")]
         public async Task<IActionResult> GetHistoryById(Guid id)
         {
             var item = await _getConversionHistoryUseCase.GetByIdAsync(id);
-            if (item is null)
-            {
-                return NotFound(new { error = "Conversão não encontrada." });
-            }
-
-            return Ok(item);
+            return this.ToActionResult(item);
         }
 
         [HttpGet("rate")]
         public async Task<IActionResult> GetRate([FromQuery] string currency, [FromQuery] DateOnly dateQuotation)
         {
             var result = await _getExchangeRateUseCase.ExecuteAsync(currency, dateQuotation);
-            return Ok(result);
+            return this.ToActionResult(result);
         }
 
         [HttpGet("supported")]
         public async Task<IActionResult> GetSupportedCurrencies()
         {
             var currencies = await _getSupportedCurrenciesUseCase.ExecuteAsync();
-            return Ok(new { currencies });
+            return this.ToActionResult(currencies);
         }
     }
 }

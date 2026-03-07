@@ -1,4 +1,5 @@
-﻿using Exchange.Application.Dtos.Requests;
+﻿using Exchange.API.Extensions;
+using Exchange.Application.Dtos.Requests;
 using Exchange.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,7 +26,7 @@ namespace Exchange.API.Controllers
             };
 
             var response = await _authenticateClientUseCase.ExecuteAsync(request);
-            return Ok(response);
+            return this.ToActionResult(response);
         }
     }
 }
