@@ -1,0 +1,46 @@
+[
+  {
+    "ParameterKey": "ProjectName",
+    "ParameterValue": "exchange-api"
+  },
+  {
+    "ParameterKey": "EnvironmentName",
+    "ParameterValue": "dev"
+  },
+  {
+    "ParameterKey": "ContainerImage",
+    "ParameterValue": "123456789012.dkr.ecr.us-east-1.amazonaws.com/exchange-api:latest"
+  },
+  {
+    "ParameterKey": "ContainerPort",
+    "ParameterValue": "8080"
+  },
+  {
+    "ParameterKey": "DesiredCount",
+    "ParameterValue": "1"
+  },
+  {
+    "ParameterKey": "TaskCpu",
+    "ParameterValue": "256"
+  },
+  {
+    "ParameterKey": "TaskMemory",
+    "ParameterValue": "512"
+  },
+  {
+    "ParameterKey": "HealthCheckPath",
+    "ParameterValue": "/health"
+  },
+  {
+    "ParameterKey": "JwtIssuer",
+    "ParameterValue": "exchange-api"
+  },
+  {
+    "ParameterKey": "JwtAudience",
+    "ParameterValue": "exchange-api-clients"
+  },
+  {
+    "ParameterKey": "JwtKey",
+    "ParameterValue": "trocar-por-uma-chave-segura-com-mais-de-32-caracteres"
+  }
+]
