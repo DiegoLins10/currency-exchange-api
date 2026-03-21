@@ -1,0 +1,83 @@
+name: deploy-ecs-cloudformation
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: deploy-ecs-cloudformation-master
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: dev
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar credenciais AWS (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ vars.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+
+      - name: Login no Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Definir URI da imagem
+        id: image
+        shell: bash
+        run: |
+          IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_REPOSITORY }}:${GITHUB_SHA}"
+          echo "uri=${IMAGE_URI}" >> "${GITHUB_OUTPUT}"
+
+      - name: Build e push da imagem Docker
+        shell: bash
+        run: |
+          docker build -t "${{ steps.image.outputs.uri }}" -f Exchange.API/Dockerfile .
+          docker push "${{ steps.image.outputs.uri }}"
+
+      - name: Validar template CloudFormation
+        shell: bash
+        run: |
+          aws cloudformation validate-template \
+            --template-body file://Infra/cloudformation/ecs-fargate.yaml \
+            --region "${{ vars.AWS_REGION }}"
+
+      - name: Deploy da stack CloudFormation
+        shell: bash
+        run: |
+          aws cloudformation deploy \
+            --stack-name "${{ vars.CFN_STACK_NAME }}" \
+            --template-file Infra/cloudformation/ecs-fargate.yaml \
+            --parameter-overrides \
+              ProjectName="${{ vars.PROJECT_NAME }}" \
+              EnvironmentName="${{ vars.ENVIRONMENT_NAME }}" \
+              ContainerImage="${{ steps.image.outputs.uri }}" \
+              ContainerPort="${{ vars.CONTAINER_PORT }}" \
+              DesiredCount="${{ vars.DESIRED_COUNT }}" \
+              TaskCpu="${{ vars.TASK_CPU }}" \
+              TaskMemory="${{ vars.TASK_MEMORY }}" \
+              HealthCheckPath="${{ vars.HEALTH_CHECK_PATH }}" \
+              JwtIssuer="${{ vars.JWT_ISSUER }}" \
+              JwtAudience="${{ vars.JWT_AUDIENCE }}" \
+              JwtKey="${{ secrets.JWT_KEY }}" \
+              LogRetentionInDays="${{ vars.LOG_RETENTION_IN_DAYS }}" \
+            --capabilities CAPABILITY_NAMED_IAM \
+            --region "${{ vars.AWS_REGION }}" \
+            --no-fail-on-empty-changeset
+
+      - name: Exibir outputs da stack
+        shell: bash
+        run: |
+          aws cloudformation describe-stacks \
+            --stack-name "${{ vars.CFN_STACK_NAME }}" \
+            --region "${{ vars.AWS_REGION }}" \
+            --query "Stacks[0].Outputs" \
+            --output table
