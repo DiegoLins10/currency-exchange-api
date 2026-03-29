@@ -185,6 +185,24 @@ Para testar a API, você pode usar os seguintes valores fixos para se autenticar
 
 A aplicação foi implantada com sucesso no **AWS ECS Fargate** e está disponível através do **ALB (Application Load Balancer)**.
 
+### Infraestrutura como código (CloudFormation)
+
+Foi adicionada a pasta `Infra/` na raiz do projeto com provisionamento via CloudFormation para ECS Fargate:
+
+- `Infra/cloudformation/ecs-fargate.yaml`: template principal de infraestrutura.
+- `Infra/cloudformation/parameters.dev.json`: parâmetros de exemplo para ambiente dev.
+- `Infra/scripts/deploy.ps1`: script para validar e aplicar stack.
+
+Comando de deploy:
+
+```powershell
+.\Infra\scripts\deploy.ps1 -StackName exchange-api-dev -Region us-east-1
+```
+
+Workflow de deploy no GitHub Actions:
+- Arquivo: `.github/workflows/deploy-ecs-cloudformation.yml`
+- Execucao manual via `workflow_dispatch` (nao executa automaticamente em push)
+
 ### 🌐 Endpoint
 Você pode acessar o endpoint de autenticação pelo link abaixo:
 
@@ -226,6 +244,7 @@ Exemplo: [Bacen - Exemplo de busca](https://olinda.bcb.gov.br/olinda/servico/PTA
 * [x] 🧩✅ **Adicionar Result Pattern ao projeto** (DONE).
 * [x] 📦✅ **Padronizar response envelope REST (`success/data/error`)** (DONE).
 * [x] ☁️🚀 **Implantar na AWS**
+* [x] ☁️🚀 **Criar Infraestrutura como codigo com CloudFormation**
 * [ ] ⏰ **Adicionar agendamento de conversões** com notificação quando taxa atingir determinado valor.
 * [ ] 🧪 **Adicionar testes de integração** 
 ### ***Indicadores de Conclusão***
